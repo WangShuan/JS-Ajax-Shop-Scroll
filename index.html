@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ajax 商品列表展示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: rgba(211, 140, 140, 0.2);
+        }
+
+        #box {
+            overflow: hidden;
+            width: 1110px;
+            margin: 10px auto;
+        }
+
+        #box .section {
+            width: 200px;
+            height: 380px;
+            border: 1px solid black;
+            float: left;
+            margin: 10px;
+        }
+
+        .section>img {
+            width: 200px;
+            height: 310px;
+        }
+
+        .section>p {
+            margin: 10px;
+            color: rgb(0, 0, 0);
+        }
+
+        h3 {
+            border: 1px solid rgb(145, 142, 142);
+            height: 50px;
+            width: 600px;
+            color: rgb(146, 2, 2);
+            margin: 15px auto;
+            text-align: center;
+            line-height: 50px;
+        }
+
+        #footer {
+            height: 50px;
+            width: 600px;
+            color: red;
+            margin: 15px auto;
+            text-align: center;
+            line-height: 50px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="head">
+        <h3>Ajax 商品列表 -- 滑動頁面加載下一頁數據</h3>
+    </div>
+    <div id="box">
+        <!-- <div class="section">
+            <img src="http://gaitaobao3.alicdn.com/tfscom/TB1LKkGGVXXXXb4XpXXXXXXXXXX.jpg" alt="">
+            <p>酒紅極顏色很正，相信會有很多姑娘都喜歡酒紅色，特別顯氣質，也顯皮膚氣色好，內搭簡潔的毛衣+打底褲，上班或者休閒都可以穿。</p>
+        </div> -->
+    </div>
+    <div id="footer">
+    </div>
+
+    <!-- <script src="./fn.js"></script> -->
+    <script src="./ajax.js"></script>
+    <script>
+        window.onload = function () {
+            var oBox = document.getElementById('box')
+            var page = 1
+            var isLoad = true
+
+            getList()
+
+            function getList() {
+                // 透過參數 page=1 切換頁面
+                ajax('GET', 'http://bluezyz.com/study/getData.php', 'page=' + page, function (response) {
+                    var jsonData = JSON.parse(response)
+                    var myData = jsonData.data
+                    for (i = 0; i < myData.length; i++) {
+                        var oDiv = document.createElement('div')
+                        oDiv.className = 'section'
+                        var oImg = document.createElement('img')
+                        oImg.src = myData[i].zs_pic
+                        oDiv.appendChild(oImg)
+                        var oText = document.createElement('p')
+                        oText.innerText = '商品描述：' + myData[i].describe.substring(0, 25) + '......'
+                        oDiv.appendChild(oText)
+                        oBox.appendChild(oDiv)
+                    }
+                    isLoad = true
+                })
+
+            }
+
+            window.onscroll=function(){
+                // 加載區塊的高度
+                var viewH = oBox.offsetHeight + 10
+                // 滾動高度
+                var scrollTop = document.body.scrollTop || document.documentElement.scrollTop
+                // 窗口高度
+                var screenH = document.documentElement.clientHeight
+
+                // 窗口高度加上滾動高度大於加載區塊高度時 就加載下一頁
+                if(scrollTop+screenH>viewH){
+                    if(isLoad){ // 判斷是否加載中 用以避免一次加載很多頁
+                        if(page>=6){
+                            alert('這已是最後一頁！')
+                            isLoad=false
+                            document.getElementById('footer').innerText = '已沒有更多商品....'
+                        }else{
+                            page++
+                            getList()
+                            isLoad=false
+                        }
+                    }
+                }
+            }
+
+        }
+    </script>
+</body>
+
+</html>
